@@ -86,7 +86,8 @@ def load_config():
             "enabled": e.getboolean("enabled", True),
             "host": e.get("smtp_host", "smtp.gmail.com"),
             "port": e.getint("smtp_port", 587),
-            "use_ssl": e.getboolean("use_ssl", False),
+            # cổng 465 luôn là SSL trực tiếp; dùng STARTTLS ở cổng này sẽ bị server ngắt kết nối
+            "use_ssl": e.getboolean("use_ssl", False) or e.getint("smtp_port", 587) == 465,
             "username": e.get("username", "").strip(),
             "password": e.get("password", "").strip(),
             "from_addr": e.get("from_addr", "").strip() or e.get("username", "").strip(),
@@ -252,17 +253,39 @@ def send_email(cfg, subject, body_html):
             else:
                 s = smtplib.SMTP(ec["host"], ec["port"], timeout=30)
                 s.starttls(context=ctx)
-            s.login(ec["username"], ec["password"])
+            _smtp_login(s, ec["username"], ec["password"])
             s.sendmail(ec["from_addr"], ec["to"], msg.as_string())
             s.quit()
             log.info("Đã gửi email: %s -> %s", subject, ", ".join(ec["to"]))
             return True
+        except smtplib.SMTPAuthenticationError as ex:
+            err = ex.smtp_error.decode(errors="replace") if isinstance(ex.smtp_error, bytes) else str(ex.smtp_error)
+            _email_error(f"Sai tên đăng nhập hoặc mật khẩu SMTP ({ex.smtp_code} {' '.join(err.split())}). "
+                         "Gmail cần 'Mật khẩu ứng dụng' 16 ký tự, không dùng mật khẩu đăng nhập thường.")
+            return False  # sai mật khẩu thì thử lại cũng vô ích
         except Exception as ex:
-            log.error("Gửi email thất bại (lần %d): %s", attempt + 1, ex)
-            if os.environ.get("GITHUB_ACTIONS"):  # hiện lỗi ở trang tóm tắt lượt chạy
-                print(f"::warning::Gửi email thất bại (lần {attempt + 1}): {ex}", flush=True)
+            _email_error(f"Gửi email thất bại (lần {attempt + 1}): {ex}")
             time.sleep(3)
     return False
+
+
+def _smtp_login(s, user, password):
+    """Đăng nhập bằng đúng 1 cơ chế. smtplib.login() thử lần lượt nhiều cơ chế, nhưng Gmail
+    ngắt kết nối sau lần sai đầu tiên -> lỗi thật (535 sai mật khẩu) bị che thành
+    'Connection unexpectedly closed'."""
+    s.ehlo_or_helo_if_needed()
+    advertised = s.esmtp_features.get("auth", "").upper().split()
+    s.user, s.password = user, password
+    for mech in ("PLAIN", "LOGIN"):
+        if mech in advertised:
+            return s.auth(mech, getattr(s, "auth_" + mech.lower()))
+    return s.login(user, password)
+
+
+def _email_error(text):
+    log.error(text)
+    if os.environ.get("GITHUB_ACTIONS"):  # hiện lỗi ở trang tóm tắt lượt chạy (không cần đăng nhập)
+        print(f"::warning::{text}", flush=True)
 
 
 def _table(rows, header, color):
