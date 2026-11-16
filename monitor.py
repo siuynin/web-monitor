@@ -266,6 +266,12 @@ def send_email(cfg, subject, body_html):
     if not ec["enabled"]:
         log.info("Email đang tắt, bỏ qua: %s", subject)
         return False
+    if os.environ.get("GITHUB_ACTIONS"):
+        missing = [n for n in ("SMTP_USERNAME", "SMTP_PASSWORD", "ALERT_TO") if not os.environ.get(n, "").strip()]
+        if missing:  # nếu không sẽ dùng giá trị mẫu trong config.example.ini và Gmail báo 535 khó hiểu
+            _email_error("Chưa khai báo Repository secret: " + ", ".join(missing) +
+                         " (Settings > Secrets and variables > Actions > tab Secrets > New repository secret)")
+            return False
     if not (ec["username"] and ec["password"] and ec["to"]):
         log.error("Chưa cấu hình email (username/password/to) trong config.ini")
         return False
