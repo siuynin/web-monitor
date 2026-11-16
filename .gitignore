@@ -1,0 +1,14 @@
+# chứa mật khẩu email - KHÔNG đưa lên GitHub
+config.ini
+monitor.log*
+dashboard.html
+status_report.xlsx
+state.json.tmp
+__pycache__/
+~$*.xlsx
+
+# video nền trình chiếu (không thuộc tool monitor, file lớn)
+worship-backgrounds/
+
+# tài liệu thương hiệu, không thuộc tool monitor
+codavi-logo/

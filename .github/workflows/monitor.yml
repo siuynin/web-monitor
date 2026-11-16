@@ -1,0 +1,61 @@
+name: Website Monitor
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # mỗi 5 phút (GitHub có thể chạy trễ vài phút)
+  workflow_dispatch:         # cho phép bấm "Run workflow" để chạy tay
+
+permissions:
+  contents: write            # để lưu state.json / history.csv về repo
+
+concurrency:
+  group: website-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Ho_Chi_Minh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Kiểm tra website
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USE_SSL: ${{ secrets.SMTP_USE_SSL }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: python monitor.py --once
+
+      - name: Lưu trạng thái
+        if: always()
+        run: |
+          git config user.name "website-monitor[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for f in state.json history.csv; do [ -f "$f" ] && git add "$f"; done
+          if ! git diff --cached --quiet; then
+            git commit -m "Cập nhật trạng thái giám sát"
+          elif [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt $((50*86400)) ]; then
+            # GitHub tắt lịch chạy nếu repo không có hoạt động 60 ngày -> commit giữ kết nối
+            git commit --allow-empty -m "Keepalive: giữ lịch giám sát hoạt động"
+          else
+            exit 0
+          fi
+          BR="${GITHUB_REF_NAME:-main}"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -q origin "$BR" && git push -q origin "HEAD:$BR" && exit 0
+            sleep 5
+          done
+          echo "::error::Không lưu được trạng thái lên repo"; exit 1
