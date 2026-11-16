@@ -20,6 +20,8 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # Secrets SMTP đang được lưu trong Environment này (Settings > Environments)
+    environment: SMTP_USERNAME
     timeout-minutes: 10
     env:
       TZ: Asia/Ho_Chi_Minh
