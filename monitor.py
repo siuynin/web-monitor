@@ -18,6 +18,7 @@ import logging.handlers
 import os
 import re
 import smtplib
+import hashlib
 import ssl
 import sys
 import time
@@ -121,7 +122,10 @@ def describe_credentials(ec):
         pw += ", KHÔNG giống mật khẩu ứng dụng Google (phải đúng 16 chữ cái a-z)"
     if any(ord(c) > 127 for c in p):
         pw += ", có ký tự lạ/có dấu"
-    return f"SMTP {ec['host']}:{ec['port']} - username: {user}; password: {pw}"
+    # mã băm 6 ký tự để so khớp với giá trị đúng mà không lộ nội dung
+    fp = lambda v: hashlib.sha256(v.encode()).hexdigest()[:6]
+    return (f"SMTP {ec['host']}:{ec['port']} - username: {user} (mã {fp(u.lower())}); "
+            f"password: {pw} (mã {fp(p)})")
 
 
 def setup_logging():
