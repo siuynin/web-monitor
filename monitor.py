@@ -64,7 +64,7 @@ def load_config():
     path = CONFIG_FILE if os.path.exists(CONFIG_FILE) else os.path.join(BASE_DIR, "config.example.ini")
     if not os.path.exists(path):
         sys.exit(f"Không tìm thấy {CONFIG_FILE}. Hãy copy config.example.ini thành config.ini và điền thông tin.")
-    cp = configparser.ConfigParser()
+    cp = configparser.ConfigParser(interpolation=None)  # mật khẩu có ký tự % vẫn đọc đúng
     cp.read(path, encoding="utf-8")
     for env, key in ENV_OVERRIDES.items():
         if os.environ.get(env, "").strip():
@@ -89,13 +89,39 @@ def load_config():
             # cổng 465 luôn là SSL trực tiếp; dùng STARTTLS ở cổng này sẽ bị server ngắt kết nối
             "use_ssl": e.getboolean("use_ssl", False) or e.getint("smtp_port", 587) == 465,
             "username": e.get("username", "").strip(),
-            "password": e.get("password", "").strip(),
+            "password": _clean_password(e.get("password", "")),
             "from_addr": e.get("from_addr", "").strip() or e.get("username", "").strip(),
             "from_name": e.get("from_name", "Website Monitor").strip(),
             "to": [x.strip() for x in re.split(r"[,;]", e.get("to", "")) if x.strip()],
             "notify_recovery": e.getboolean("notify_recovery", True),
         },
     }
+
+
+def _clean_password(pw):
+    pw = pw.strip().strip("\"'").strip()
+    # Mật khẩu ứng dụng Google hiển thị dạng "abcd efgh ijkl mnop" -> bỏ dấu cách
+    if re.fullmatch(r"[a-zA-Z]{4}(\s?[a-zA-Z]{4}){3}", pw):
+        pw = re.sub(r"\s", "", pw)
+    return pw
+
+
+def describe_credentials(ec):
+    """Mô tả dạng thông tin đăng nhập mà KHÔNG lộ giá trị (để chẩn đoán lỗi 535)."""
+    u, p = ec["username"], ec["password"]
+    dom = u.rsplit("@", 1)[1].lower() if "@" in u else ""
+    user = ("thiếu '@domain' (cần ghi đầy đủ địa chỉ email)" if not dom else
+            "đuôi @gmail.com" if dom == "gmail.com" else "đuôi tên miền riêng (không phải gmail.com)")
+    if any(c.isspace() for c in u):
+        user += ", CÓ dấu cách"
+    pw = f"dài {len(p)} ký tự"
+    if re.fullmatch(r"[a-z]{16}", p):
+        pw += ", đúng dạng mật khẩu ứng dụng Google (16 chữ thường)"
+    else:
+        pw += ", KHÔNG giống mật khẩu ứng dụng Google (phải đúng 16 chữ cái a-z)"
+    if any(ord(c) > 127 for c in p):
+        pw += ", có ký tự lạ/có dấu"
+    return f"SMTP {ec['host']}:{ec['port']} - username: {user}; password: {pw}"
 
 
 def setup_logging():
@@ -262,6 +288,7 @@ def send_email(cfg, subject, body_html):
             err = ex.smtp_error.decode(errors="replace") if isinstance(ex.smtp_error, bytes) else str(ex.smtp_error)
             _email_error(f"Sai tên đăng nhập hoặc mật khẩu SMTP ({ex.smtp_code} {' '.join(err.split())}). "
                          "Gmail cần 'Mật khẩu ứng dụng' 16 ký tự, không dùng mật khẩu đăng nhập thường.")
+            _email_error("Chẩn đoán: " + describe_credentials(ec))
             return False  # sai mật khẩu thì thử lại cũng vô ích
         except Exception as ex:
             _email_error(f"Gửi email thất bại (lần {attempt + 1}): {ex}")
