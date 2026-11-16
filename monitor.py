@@ -259,6 +259,8 @@ def send_email(cfg, subject, body_html):
             return True
         except Exception as ex:
             log.error("Gửi email thất bại (lần %d): %s", attempt + 1, ex)
+            if os.environ.get("GITHUB_ACTIONS"):  # hiện lỗi ở trang tóm tắt lượt chạy
+                print(f"::warning::Gửi email thất bại (lần {attempt + 1}): {ex}", flush=True)
             time.sleep(3)
     return False
 
