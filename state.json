@@ -1,155 +1,71 @@
 {
  "babysun.edu.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "fitothinh.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "bpidoor.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "tomgiongso1.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "congty304.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "vigortvn.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "manimanispa.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "ztastone.com": {
   "down": false
  },
  "thuydungcoffee.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "xgreenfarm.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "thuexedulichtaynguyen.com": {
   "down": false
  },
  "lalisa.edu.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "batdongsangl.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "linkcons.com.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "sieuthitourtoancau.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "vietkimfruit.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "tourforyou.com.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "clovergroupvn.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "hoanglan.com.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "kingmacca.com.vn": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "marketingtoancaudx.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "taxiquynhon7724h.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  },
  "thevietnamcompass.com": {
-  "down": true,
-  "since": 1794847186.060665,
-  "last_alert": 1794875366.871227,
-  "alerts": 2,
-  "error": "Lỗi chứng chỉ SSL: SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)'))"
+  "down": false
  }
 }
