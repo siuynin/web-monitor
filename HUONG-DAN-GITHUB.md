@@ -1,6 +1,7 @@
 # Chạy Website Monitor 24/24 miễn phí trên GitHub Actions
 
-GitHub sẽ tự kiểm tra các website trong `website serve.xlsx` khoảng **5–15 phút/lần**
+GitHub sẽ tự kiểm tra các website trong `website serve.xlsx` **mỗi 60 giây** (mỗi lượt chạy
+kéo dài ~5 giờ 40 phút rồi tự khởi động lượt kế tiếp)
 (lịch của GitHub thường trễ vài phút) và gửi email khi có website lỗi hoặc hoạt động lại.
 
 > Repo phải để **Public** thì mới chạy miễn phí không giới hạn. Ai cũng xem được danh sách
@@ -58,8 +59,9 @@ Hoặc trên GitHub: **Add file → Upload files** → tải file Excel mới l�
 
 ## Thay đổi cài đặt (chu kỳ nhắc, số email tối đa…)
 Sửa `config.example.ini` (trên GitHub dùng file này, không dùng `config.ini`), rồi commit/push.
-Muốn đổi tần suất kiểm tra thì sửa dòng `cron` trong `.github/workflows/monitor.yml`
-(5 phút là nhanh nhất GitHub cho phép).
+Muốn đổi tần suất kiểm tra thì sửa `interval_seconds` trong `config.example.ini`.
+Muốn dừng giám sát: tab Actions → Website Monitor → "..." → **Disable workflow**
+(bật lại: Enable workflow rồi bấm Run workflow).
 
 ## Ghi chú
 - Trạng thái (`state.json`) và lịch sử lỗi (`history.csv`) được bot tự commit về repo khi có thay đổi

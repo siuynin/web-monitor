@@ -1,9 +1,14 @@
 name: Website Monitor
 
+# Mỗi lượt chạy kiểm tra liên tục mỗi 60 giây trong ~5 giờ 40 phút, rồi tự khởi động lượt kế tiếp.
+# (Lịch cron của GitHub rất thất thường - có khi vài tiếng mới chạy 1 lần - nên không dựa vào nó.)
+# Lịch cron bên dưới chỉ để dự phòng: khởi động lại nếu chuỗi bị đứt.
+# Muốn dừng hẳn: tab Actions > Website Monitor > "..." > Disable workflow.
+
 on:
   schedule:
-    - cron: "*/5 * * * *"   # mỗi 5 phút (GitHub có thể chạy trễ vài phút)
-  workflow_dispatch:         # cho phép bấm "Run workflow" để chạy tay
+    - cron: "23 */2 * * *"   # dự phòng, 2 tiếng/lần
+  workflow_dispatch:          # bấm "Run workflow" để khởi động lại / gửi email thử
     inputs:
       test_email:
         description: "Chỉ gửi email thử (kiểm tra Secrets SMTP), không kiểm tra website"
@@ -11,10 +16,12 @@ on:
         default: false
 
 permissions:
-  contents: write            # để lưu state.json / history.csv về repo
+  contents: write            # lưu state.json / history.csv về repo
+  actions: write             # tự khởi động lượt chạy kế tiếp
 
 concurrency:
-  group: website-monitor
+  # chỉ 1 lượt giám sát chạy cùng lúc; email thử chạy riêng, không phải chờ
+  group: website-monitor${{ inputs.test_email && '-test' || '' }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     # Secrets SMTP đang được lưu trong Environment này (Settings > Environments)
     environment: SMTP_USERNAME
-    timeout-minutes: 10
+    timeout-minutes: 355
     env:
       TZ: Asia/Ho_Chi_Minh
     steps:
@@ -44,30 +51,22 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
+          MONITOR_SAVE_CMD: bash .github/save-state.sh
+          MONITOR_SYNC_CMD: git pull -q --rebase --autostash origin ${{ github.ref_name }}
         run: |
           if [ "${{ inputs.test_email }}" = "true" ]; then
             python monitor.py --test-email
           else
-            python monitor.py --once
+            python monitor.py --duration 20400   # 5 giờ 40 phút
           fi
 
       - name: Lưu trạng thái
-        if: always()
-        run: |
-          git config user.name "website-monitor[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for f in state.json history.csv; do [ -f "$f" ] && git add "$f"; done
-          if ! git diff --cached --quiet; then
-            git commit -m "Cập nhật trạng thái giám sát"
-          elif [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt $((50*86400)) ]; then
-            # GitHub tắt lịch chạy nếu repo không có hoạt động 60 ngày -> commit giữ kết nối
-            git commit --allow-empty -m "Keepalive: giữ lịch giám sát hoạt động"
-          else
-            exit 0
-          fi
-          BR="${GITHUB_REF_NAME:-main}"
-          for i in 1 2 3; do
-            git pull --rebase --autostash -q origin "$BR" && git push -q origin "HEAD:$BR" && exit 0
-            sleep 5
-          done
-          echo "::error::Không lưu được trạng thái lên repo"; exit 1
+        if: always() && inputs.test_email != true
+        run: bash .github/save-state.sh
+
+      - name: Khởi động lượt kế tiếp
+        # không chạy khi bị huỷ tay -> bấm Cancel là dừng được chuỗi
+        if: (success() || failure()) && inputs.test_email != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run monitor.yml --ref "${{ github.ref_name }}" -R "${{ github.repository }}"

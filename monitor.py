@@ -20,6 +20,7 @@ import re
 import smtplib
 import hashlib
 import ssl
+import subprocess
 import sys
 import time
 import warnings
@@ -430,7 +431,7 @@ def write_github_summary(results):
     for r in sorted(results, key=lambda x: (x["ok"], x["site"])):
         lines.append(f'| {"🟢" if r["ok"] else "🔴"} | {r["site"]} | {r["code"] or "-"} | '
                      f'{(str(r["ms"]) + " ms") if r["ms"] else "-"} | {(r["error"] or "").replace("|", "/")} |')
-    with open(path, "a", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8") as f:  # chỉ giữ bảng của lượt kiểm tra mới nhất
         f.write("\n".join(lines) + "\n")
 
 
@@ -439,7 +440,7 @@ def run_cycle(cfg, state):
     sites = read_sites(cfg)
     if not sites:
         log.warning("Không có website nào trong file Excel")
-        return
+        return False
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=cfg["workers"]) as ex:
         results = list(ex.map(lambda s: check_site(s, cfg), sites))
@@ -499,12 +500,15 @@ def run_cycle(cfg, state):
     n_down = sum(not r["ok"] for r in results)
     log.info("Đã kiểm tra %d site trong %.1fs: %d hoạt động, %d lỗi",
              len(results), time.time() - t0, len(results) - n_down, n_down)
+    return bool(history or newly_down or still_down)
 
 
 def main():
     ap = argparse.ArgumentParser(description="Website Monitor")
     ap.add_argument("--once", action="store_true", help="kiểm tra 1 lượt rồi thoát")
     ap.add_argument("--test-email", action="store_true", help="gửi email thử")
+    ap.add_argument("--duration", type=int, default=0,
+                    help="chạy liên tục bấy nhiêu giây rồi thoát (dùng trên GitHub Actions)")
     args = ap.parse_args()
 
     setup_logging()
@@ -518,18 +522,42 @@ def main():
     state = load_state()
     log.info("Bắt đầu giám sát - chu kỳ %ds, timeout %ds, file: %s",
              cfg["interval"], cfg["timeout"], cfg["excel_file"])
+    began = last_sync = time.time()
     while True:
         start = time.time()
+        if os.environ.get("MONITOR_SYNC_CMD") and start - last_sync >= 15 * 60:
+            # lấy file Excel/cấu hình mới nếu vừa được sửa trên repo
+            _run_cmd(os.environ["MONITOR_SYNC_CMD"])
+            last_sync = start
         try:
             cfg = load_config()  # cho phép sửa config.ini khi đang chạy
-            run_cycle(cfg, state)
+            if run_cycle(cfg, state):
+                save_to_repo()
         except KeyboardInterrupt:
             raise
         except Exception:
             log.exception("Lỗi trong lượt kiểm tra")
         if args.once:
             break
-        time.sleep(max(1, cfg["interval"] - (time.time() - start)))
+        wait = max(1, cfg["interval"] - (time.time() - start))
+        if args.duration and time.time() - began + wait + cfg["interval"] > args.duration:
+            log.info("Hết thời gian chạy (%s), kết thúc lượt này", fmt_duration(time.time() - began))
+            break
+        time.sleep(wait)
+
+
+def save_to_repo():
+    """Trên GitHub Actions: lưu state.json/history.csv về repo ngay khi có sự cố/khôi phục,
+    để không mất trạng thái nếu lượt chạy dài bị dừng giữa chừng."""
+    if os.environ.get("MONITOR_SAVE_CMD"):
+        _run_cmd(os.environ["MONITOR_SAVE_CMD"])
+
+
+def _run_cmd(cmd):
+    try:
+        subprocess.run(cmd, shell=True, timeout=120, check=False)
+    except Exception as ex:
+        log.warning("Lệnh '%s' lỗi: %s", cmd, ex)
 
 
 if __name__ == "__main__":
