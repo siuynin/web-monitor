@@ -21,11 +21,7 @@
   "down": false
  },
  "thuydungcoffee.com": {
-  "down": true,
-  "since": 1794983109.4384568,
-  "last_alert": 1794983109.4384568,
-  "alerts": 1,
-  "error": "Quá thời gian phản hồi (15s)"
+  "down": false
  },
  "xgreenfarm.com": {
   "down": false
