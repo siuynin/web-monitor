@@ -3,11 +3,7 @@
   "down": false
  },
  "fitothinh.com": {
-  "down": true,
-  "since": 1794968204.6511128,
-  "last_alert": 1794968204.6511128,
-  "alerts": 1,
-  "error": "Quá thời gian phản hồi (15s)"
+  "down": false
  },
  "bpidoor.com": {
   "down": false
