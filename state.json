@@ -27,11 +27,7 @@
   "down": false
  },
  "thuexedulichtaynguyen.com": {
-  "down": true,
-  "since": 1795208520.2621603,
-  "last_alert": 1795208520.2621603,
-  "alerts": 1,
-  "error": "Quá thời gian phản hồi (15s)"
+  "down": false
  },
  "lalisa.edu.vn": {
   "down": false
